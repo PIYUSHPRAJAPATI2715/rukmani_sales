@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>267123965425-ns7qmgk5i3kr3pl1iqf8khs4er4gr62u.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.267123965425-ns7qmgk5i3kr3pl1iqf8khs4er4gr62u</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>267123965425-n92b6mtvo0n7ifsn32umqep199kf4nlg.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyC54z8wnQO4yXsiJAKYRNHgeKVgHLqQmAA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>267123965425</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.rukmani.sales.ios</string>
+	<key>PROJECT_ID</key>
+	<string>borawar-oil-meal</string>
+	<key>STORAGE_BUCKET</key>
+	<string>borawar-oil-meal.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:267123965425:ios:603ff6a79a5ec0b98a1850</string>
+</dict>
+</plist>
