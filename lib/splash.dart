@@ -19,7 +19,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   next() {
-    Timer(const Duration(seconds: 6), () async {
+    Timer(const Duration(seconds: 4), () async {
       checkLogin();
     });
   }

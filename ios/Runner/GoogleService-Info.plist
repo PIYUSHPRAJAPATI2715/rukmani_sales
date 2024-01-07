@@ -17,9 +17,9 @@
 	<key>BUNDLE_ID</key>
 	<string>com.rukmani.sales.ios</string>
 	<key>PROJECT_ID</key>
-	<string>borawar-oil-meal</string>
+	<string>Rukmani-Sales</string>
 	<key>STORAGE_BUCKET</key>
-	<string>borawar-oil-meal.appspot.com</string>
+	<string>Rukmani-Sales.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false/>
 	<key>IS_ANALYTICS_ENABLED</key>

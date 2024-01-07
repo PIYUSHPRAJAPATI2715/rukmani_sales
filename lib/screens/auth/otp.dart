@@ -9,6 +9,7 @@ import 'package:pinput/pinput.dart';
 
 import '../home_screens/profile.dart';
 import '../../bottom_navigation_bar_screen.dart';
+import '../widgets/apptheme.dart';
 import '../widgets/helper.dart';
 
 class Otp extends StatefulWidget {
@@ -46,8 +47,11 @@ class _OtpState extends State<Otp> {
                     color: Colors.deepPurple.shade50,
                     shape: BoxShape.circle,
                   ),
-                  child: Image.asset(
-                    'assets/images/borawarlogo.png',
+                  child: ClipOval(
+
+                    child: Image.asset(
+                      'assets/images/R.png',
+                    ),
                   ),
                 ),
                 const SizedBox(
@@ -124,7 +128,7 @@ class _OtpState extends State<Otp> {
                           },
                           style: ButtonStyle(
                             foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                            backgroundColor: MaterialStateProperty.all<Color>(Colors.purple),
+                            backgroundColor: MaterialStateProperty.all<Color>(AppTheme.primaryColor),
                             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(24.0),

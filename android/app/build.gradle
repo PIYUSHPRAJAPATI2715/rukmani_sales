@@ -26,6 +26,13 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace "com.rukmani.sales"
     compileSdkVersion 33
@@ -56,10 +63,10 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file("//Users//manish//myproject//android//upload-keystore.jks")
-            storePassword "Manish1@babu"
-            keyAlias "upload"
-            keyPassword "Manish1@babu"
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
         }
     }
 
@@ -81,4 +88,5 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation("androidx.multidex:multidex:2.0.1")
     implementation("com.google.firebase:firebase-bom:32.2.2")
+
 }

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:myproject/screens/auth/otp.dart';
+import 'package:myproject/screens/widgets/apptheme.dart';
 
 import '../widgets/helper.dart';
 
@@ -50,7 +51,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     shape: BoxShape.circle,
                   ),
                   child: Image.asset(
-                    'assets/images/borawarlogo.png',
+                    'assets/images/R.png',
                   ),
                 ),
                 const SizedBox(
@@ -121,14 +122,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
+                            // showToast('message not come');
                             OverlayEntry loader = Helper.overlayLoader(context);
                             Overlay.of(context).insert(loader);
+                            // showToast('number is not verify');
                             auth.verifyPhoneNumber(
                               phoneNumber: "${"+91"}${phoneController.text.trim()}",
                               verificationCompleted: (PhoneAuthCredential credential) {},
-                              verificationFailed: (FirebaseAuthException e) {},
-                              codeSent: (String verificationId, int? resendToken) {
+                              verificationFailed: (FirebaseAuthException e) {
+                                 // showToast(e);
+
+                              },
+
+                                codeSent: (String verificationId, int? resendToken) {
                                 SignUpScreen.verify = verificationId;
+                                // showToast('code is not sent');
+
                                 Get.to(const Otp());
                                 Helper.hideLoader(loader);
 
@@ -138,7 +147,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           },
                           style: ButtonStyle(
                             foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                            backgroundColor: MaterialStateProperty.all<Color>(Colors.purple),
+                            backgroundColor: MaterialStateProperty.all<Color>(AppTheme.primaryColor),
                             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(24.0),

@@ -415,10 +415,10 @@ class _OrderDetailsState extends State<OrderDetails> {
                                                               .then((value) {
                                                             if (value.exists) {
                                                               sendPushNotification(
-                                                                  body: 'Thanks for taking Borwar oil',
+                                                                  body: 'Thanks for taking Rukamni sales product',
                                                                   deviceToken: value.data()!["fcmtoken"],
-                                                                  image:
-                                                                  "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiQ7G30050tUKY85hHzPZbRn6h5pAI73XO-hkXQmjcaM4YeHISX_sVOOY7uoLKmMtH69407vKotjOrny51PErCAYu3qiVzq5bccATSVHYwYclFTLrBlr6U_jixKl3ow1xV2o7f18Ln65GmMWRtI02DsMj9FLodBwzI18S0DMmseoJAbyXw5snSC-hKZ_vc/s16000/Blue%20and%20Pink%20Professional%20Business%20Strategy%20Presentation.jpg",
+                                                                  image:"",
+                                                                  // "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiQ7G30050tUKY85hHzPZbRn6h5pAI73XO-hkXQmjcaM4YeHISX_sVOOY7uoLKmMtH69407vKotjOrny51PErCAYu3qiVzq5bccATSVHYwYclFTLrBlr6U_jixKl3ow1xV2o7f18Ln65GmMWRtI02DsMj9FLodBwzI18S0DMmseoJAbyXw5snSC-hKZ_vc/s16000/Blue%20and%20Pink%20Professional%20Business%20Strategy%20Presentation.jpg",
                                                                   title: 'Your Order is delivered',
                                                                   orderID: '3');
                                                             }
@@ -550,7 +550,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                   ElevatedButton.icon(
                       onPressed: () async {
                         var url =
-                            'https://wa.me/9549348495?text=Borawar Help Support';
+                            'https://wa.me/9549348495?text=RukmaniSales Help Support';
                         await launch(url);
                       },
                       icon: Image.asset(
