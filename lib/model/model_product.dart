@@ -1,47 +1,65 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:myproject/helper/new_helper.dart';
 
 class Product {
-  String id; // Document ID from Firestore
+  String id;
   String name;
   double price;
   String description;
   String imageUrl;
   String category;
-  bool? inStock;
+  String subcategory;
+  bool inStock;
 
   Product({
     required this.id,
     required this.name,
-    this.inStock,
     required this.price,
     required this.description,
     required this.imageUrl,
     required this.category,
+    required this.subcategory,
+    this.inStock = false,
   });
 
-  // Factory method to create a Product object from a map and document ID
+  // Create a Product from Firestore document data
   factory Product.fromMap(String id, Map<String, dynamic> map) {
     return Product(
       id: id,
       name: map['name'] ?? '',
-      inStock: map['inStock'] ?? false,
-      price: map['price'].toString().toNum.toDouble(),
+      price: double.tryParse(map['price'].toString()) ?? 0.0,
       description: map['description'] ?? '',
       imageUrl: map['imageUrl'] ?? '',
       category: map['category'] ?? '',
+      subcategory: map['subcategory'] ?? '',
+      inStock: map['inStock'] ?? false,
     );
   }
+
+  // Convert Product object to Firestore-compatible Map
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'price': price,  // ✅ Ensure stored as double
+      'description': description,
+      'imageUrl': imageUrl,
+      'category': category,
+      'subcategory': subcategory,
+      'inStock': inStock,
+    };
+  }
+
+  // Create Product object from Firestore DocumentSnapshot
   static Product fromSnapshot(DocumentSnapshot snap) {
-    Product product = Product(
-      name: snap['name'],
-      price: snap['price'],
-      inStock: snap['inStock'],
-      imageUrl: snap['imageUrl'],
-      description: snap['description'],
-      id: snap['id'],
-      category: snap['category'],
+    var data = snap.data() as Map<String, dynamic>;
+    return Product(
+      id: snap.id,
+      name: data['name'] ?? '',
+      price: double.tryParse(snap['price'].toString()) ?? 0.0,
+      description: data['description'] ?? '',
+      imageUrl: data['imageUrl'] ?? '',
+      category: data['category'] ?? '',
+      subcategory: data['subcategory'] ?? '',
+      inStock: data['inStock'] ?? false,
     );
-    return product;
   }
 }

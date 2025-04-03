@@ -50,8 +50,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     color: Colors.deepPurple.shade50,
                     shape: BoxShape.circle,
                   ),
-                  child: Image.asset(
-                    'assets/images/R.png',
+                  child: ClipOval(
+
+                    child: Image.asset(
+                      'assets/images/rukamni.png',
+                    ),
                   ),
                 ),
                 const SizedBox(

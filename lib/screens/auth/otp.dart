@@ -49,8 +49,11 @@ class _OtpState extends State<Otp> {
                   ),
                   child: ClipOval(
 
-                    child: Image.asset(
-                      'assets/images/R.png',
+                    child: ClipOval(
+
+                      child: Image.asset(
+                        'assets/images/rukamni.png',
+                      ),
                     ),
                   ),
                 ),

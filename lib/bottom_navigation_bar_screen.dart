@@ -1,7 +1,9 @@
 import 'package:awesome_bottom_bar/awesome_bottom_bar.dart';
 import 'package:awesome_bottom_bar/widgets/inspired/inspired.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:myproject/screens/home_screens/fav_products.dart';
 import 'firebase_services/firestore_service.dart';
 import 'screens/home_screens/profile.dart';
 import 'screens/search/search_products.dart';
@@ -17,8 +19,8 @@ const List<TabItem> items = [
     title: 'Home',
   ),
   TabItem(
-    icon: Icons.search_sharp,
-    title: 'Shop',
+    icon: Icons.category,
+    title: 'Categories',
   ),
   TabItem(
     icon: Icons.shopping_cart_outlined,
@@ -40,8 +42,8 @@ class BottomNavigationScreen extends StatefulWidget {
 class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final FirebaseFireStoreService fireStoreService = FirebaseFireStoreService();
-  Color color2 = Colors.white;
-  Color bgColor = Colors.red;
+  Color color2 = Colors.black;
+  Color bgColor = Colors.amber;
 
   int selectedIndex = 0;
 
@@ -84,6 +86,11 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
+          fireStoreService.auth.currentUser != null?
+          IconButton(
+            icon: const Icon(Icons.favorite),
+            onPressed: () => Get.to(() =>  FavoritesScreen()),
+          ):SizedBox.shrink(),
           CartButton(
             onPressed: () {
               selectedIndex = 2;
@@ -93,6 +100,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
         ],
       ),
       body: IndexedStack(
+
         index: selectedIndex,
         children: homeScreens,
       ),
@@ -107,6 +115,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
         }),
         chipStyle: const ChipStyle(convexBridge: true),
         itemStyle: ItemStyle.circle,
+
         animated: false,
       ),
     );

@@ -87,10 +87,8 @@ class _AddressScreenState extends State<AddressScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Delivery Address',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 18),
-        ),
+        title: const Text("Delivery Details"),
+        backgroundColor: Colors.amber,
       ),
       body: apiLoaded
           ? SingleChildScrollView(

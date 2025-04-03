@@ -102,10 +102,8 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Select Delivery Address',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 18),
-        ),
+        title: const Text("Select Delivery Address"),
+        backgroundColor: Colors.amber,
       ),
       body: apiLoaded
           ? SingleChildScrollView(

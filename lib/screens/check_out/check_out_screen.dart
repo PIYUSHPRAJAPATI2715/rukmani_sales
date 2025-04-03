@@ -10,8 +10,7 @@ import 'package:collection/collection.dart';
 import 'package:myproject/bottom_navigation_bar_screen.dart';
 import 'package:myproject/helper/new_helper.dart';
 import 'package:myproject/screens/widgets/loading_animation.dart';
-import 'package:upi_india/upi_app.dart';
-import 'package:upi_india/upi_india.dart';
+
 import '../../firebase_services/firestore_service.dart';
 import '../../firebase_services/notification_api.dart';
 import '../../helper/helper.dart';
@@ -39,9 +38,9 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   bool upiLoaded = false;
 
   bool updatingValue = false;
-  List<UpiApp> apps = [];
-  UpiApp? upiApp;
-  final UpiIndia _upiIndia = UpiIndia();
+  // List<UpiApp> apps = [];
+  // UpiApp? upiApp;
+  // final UpiIndia _upiIndia = UpiIndia();
 
   updateValue({
     required String productId,
@@ -78,7 +77,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   void initState() {
     super.initState();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      getAvailableApps();
+      // getAvailableApps();
       // FirebaseFirestore.instance.collection("shipping_collection").get().then((value) {
       // print("Got Model Shipping address....     ${value.docs.first.data()}");
       // print("Got Model Shipping address....     ${value.docs.first.id}");
@@ -94,79 +93,79 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
 
   ///Upi Payment
 
-  getAvailableApps() {
-    if (Platform.isAndroid) {
-      _upiIndia.getAllUpiApps(mandatoryTransactionId: false).then((value) {
-        apps = value;
-        if (kDebugMode) {
-          print(apps.map((e) => e.name).toString());
-        }
-        upiLoaded = true;
-        setState(() {});
-      }).catchError((e) {
-        apps = [];
-      });
-    } else {
-      apps = [];
-      upiLoaded = true;
-      cashOnDelivery.value = "Cod";
-    }
-  }
-
-  Future<UpiResponse> initiateTransaction(
-      UpiApp app, refId, double total) async {
-    print("widget.cityUpi....      ${widget.cityUpi}");
-    return _upiIndia.startTransaction(
-      app: app,
-      receiverUpiId: widget.cityUpi,
-      receiverName: modelShippingAddress!.shopName!,
-      transactionRefId: refId,
-      transactionNote: 'Add Funds',
-      amount: total,
-    );
-  }
-
-  addPaymentUPI(double total, shipping) {
-    if (total > 100000) {
-      showToast("Total Amount is greater than 1,00,000\n"
-          "Lower the amount to initiate order");
-      return;
-    }
-    if (upiApp == null && cashOnDelivery.isEmpty) {
-      showToast("Select Available Payment Methods");
-      return;
-    }
-    if (upiApp != null) {
-      final refId = DateTime.now().microsecondsSinceEpoch.toString();
-      initiateTransaction(upiApp!, refId, total).then((value) {
-        if (value.status.toString() == "success") {
-          // value.transactionId ?? refId;
-          fireStoreService.checkOutTransaction(
-              shipping: shipping,
-              total: total.toString(),
-              paymentMethod: upiApp != null
-                  ? upiApp!.name.toString()
-                  : cashOnDelivery.value,
-              transactionId: value.transactionId ?? refId,
-              address: widget.address.toJson(),
-              context: context);
-        } else {
-          showToast("Payment Canceled");
-        }
-      });
-    }
-    if (cashOnDelivery.value == "Cod") {
-      final refId = DateTime.now().microsecondsSinceEpoch.toString();
-      fireStoreService.checkOutTransaction(
-          shipping: shipping,
-          total: total.toString(),
-          paymentMethod:
-              upiApp != null ? upiApp!.name.toString() : cashOnDelivery.value,
-          transactionId: refId,
-          address: widget.address.toJson(),
-          context: context);
-    }
-  }
+  // getAvailableApps() {
+  //   if (Platform.isAndroid) {
+  //     _upiIndia.getAllUpiApps(mandatoryTransactionId: false).then((value) {
+  //       apps = value;
+  //       if (kDebugMode) {
+  //         print(apps.map((e) => e.name).toString());
+  //       }
+  //       upiLoaded = true;
+  //       setState(() {});
+  //     }).catchError((e) {
+  //       apps = [];
+  //     });
+  //   } else {
+  //     apps = [];
+  //     upiLoaded = true;
+  //     cashOnDelivery.value = "Cod";
+  //   }
+  // }
+  //
+  // Future<UpiResponse> initiateTransaction(
+  //     UpiApp app, refId, double total) async {
+  //   print("widget.cityUpi....      ${widget.cityUpi}");
+  //   return _upiIndia.startTransaction(
+  //     app: app,
+  //     receiverUpiId: widget.cityUpi,
+  //     receiverName: modelShippingAddress!.shopName!,
+  //     transactionRefId: refId,
+  //     transactionNote: 'Add Funds',
+  //     amount: total,
+  //   );
+  // }
+  //
+  // addPaymentUPI(double total, shipping) {
+  //   if (total > 100000) {
+  //     showToast("Total Amount is greater than 1,00,000\n"
+  //         "Lower the amount to initiate order");
+  //     return;
+  //   }
+  //   if (upiApp == null && cashOnDelivery.isEmpty) {
+  //     showToast("Select Available Payment Methods");
+  //     return;
+  //   }
+  //   if (upiApp != null) {
+  //     final refId = DateTime.now().microsecondsSinceEpoch.toString();
+  //     initiateTransaction(upiApp!, refId, total).then((value) {
+  //       if (value.status.toString() == "success") {
+  //         // value.transactionId ?? refId;
+  //         fireStoreService.checkOutTransaction(
+  //             shipping: shipping,
+  //             total: total.toString(),
+  //             paymentMethod: upiApp != null
+  //                 ? upiApp!.name.toString()
+  //                 : cashOnDelivery.value,
+  //             transactionId: value.transactionId ?? refId,
+  //             address: widget.address.toJson(),
+  //             context: context);
+  //       } else {
+  //         showToast("Payment Canceled");
+  //       }
+  //     });
+  //   }
+  //   if (cashOnDelivery.value == "Cod") {
+  //     final refId = DateTime.now().microsecondsSinceEpoch.toString();
+  //     fireStoreService.checkOutTransaction(
+  //         shipping: shipping,
+  //         total: total.toString(),
+  //         paymentMethod:
+  //             upiApp != null ? upiApp!.name.toString() : cashOnDelivery.value,
+  //         transactionId: refId,
+  //         address: widget.address.toJson(),
+  //         context: context);
+  //   }
+  // }
 
   RxString cashOnDelivery = "".obs;
 
@@ -174,12 +173,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        title: Text(
-          'Place Order',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 18),
-        ),
+        title: const Text("Place Order"),
+        backgroundColor: Colors.amber,
       ),
       body: modelShippingAddress != null && upiLoaded
           ? SingleChildScrollView(
@@ -432,13 +427,13 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                   showToast("some product is out of stock");
                                   return;
                                 }
-                                addPaymentUPI(
-                                  totalAmount,
-                                  freeShipping
-                                      ? "0"
-                                      : modelShippingAddress!.shippingAmount
-                                          .toString(),
-                                );
+                                // addPaymentUPI(
+                                //   totalAmount,
+                                //   freeShipping
+                                //       ? "0"
+                                //       : modelShippingAddress!.shippingAmount
+                                //           .toString(),
+                                // );
                                 FirebaseFirestore.instance
                                     .collection('fcmtoken')
                                     .doc('admin_token')
@@ -458,7 +453,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                 Get.to(const OrdersScreen());
                               },
                               style: ElevatedButton.styleFrom(
-                                  primary: Colors.blue,
+                                  backgroundColor: Colors.blue,
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 50),
                                   shape: RoundedRectangleBorder(
@@ -586,45 +581,45 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
               height: 6,
             ),
             if (Platform.isAndroid)
-              if (apps.isNotEmpty)
-                ...apps
-                    .map((e) => Obx(() {
-                          if (refreshInt > 0) {}
-                          return ListTile(
-                            // dense: true,
-                            contentPadding: EdgeInsets.zero,
-                            onTap: () {
-                              upiApp = e;
-                              refreshInt.value =
-                                  DateTime.now().millisecondsSinceEpoch;
-                              cashOnDelivery.value = "";
-                            },
-                            visualDensity: VisualDensity.compact,
-                            title: Text(e.name.toString()),
-                            trailing: IgnorePointer(
-                              ignoring: true,
-                              child: Radio<UpiApp?>(
-                                value: e,
-                                visualDensity: VisualDensity.compact,
-                                groupValue: upiApp,
-                                onChanged: (fa) {},
-                              ),
-                            ),
-                            leading: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Image.memory(e.icon),
-                            ),
-                          );
-                        }))
-                    .toList()
-              else
+              // if (apps.isNotEmpty)
+              //   ...apps
+              //       .map((e) => Obx(() {
+              //             if (refreshInt > 0) {}
+              //             return ListTile(
+              //               // dense: true,
+              //               contentPadding: EdgeInsets.zero,
+              //               onTap: () {
+              //                 upiApp = e;
+              //                 refreshInt.value =
+              //                     DateTime.now().millisecondsSinceEpoch;
+              //                 cashOnDelivery.value = "";
+              //               },
+              //               visualDensity: VisualDensity.compact,
+              //               title: Text(e.name.toString()),
+              //               trailing: IgnorePointer(
+              //                 ignoring: true,
+              //                 child: Radio<UpiApp?>(
+              //                   value: e,
+              //                   visualDensity: VisualDensity.compact,
+              //                   groupValue: upiApp,
+              //                   onChanged: (fa) {},
+              //                 ),
+              //               ),
+              //               leading: Padding(
+              //                 padding: const EdgeInsets.all(8.0),
+              //                 child: Image.memory(e.icon),
+              //               ),
+              //             );
+              //           }))
+              //       .toList()
+              // else
                 const Center(
                   child: Text("No UPI installed"),
                 ),
             Obx(() => ListTile(
                   contentPadding: EdgeInsets.zero,
                   onTap: () {
-                    upiApp = null;
+                    // upiApp = null;
                     refreshInt.value = DateTime.now().millisecondsSinceEpoch;
                     cashOnDelivery.value = "Cod";
                   },

@@ -17,7 +17,9 @@ class _CommonAppBarState extends State<CommonAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      backgroundColor: Colors.amber,
       title: Text(
+
         widget.title,
         style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 18),
       ),

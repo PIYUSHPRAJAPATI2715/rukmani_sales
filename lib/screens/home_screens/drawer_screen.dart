@@ -2,12 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:myproject/firebase_services/firestore_service.dart';
+import 'package:myproject/screens/home_screens/privacy_policy.dart';
+import 'package:myproject/screens/home_screens/term&condition.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../admin/homepage.dart';
 import '../auth/signup.dart';
 import '../check_out/delivery_address.dart';
 import '../orders/orders_screen.dart';
+import 'About_us.dart';
 import 'profile.dart';
 import '../orders/address_screen.dart';
 
@@ -31,18 +34,22 @@ class _DrawerScreenState extends State<DrawerScreen> {
         children: <Widget>[
           DrawerHeader(
             decoration: const BoxDecoration(
-              color: Colors.red,
+              gradient: LinearGradient(
+                colors: [Colors.black, Colors.amber], // Black to Golden Gradient
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
             child: Column(
               children: [
                 ClipOval(
                   child: Image.asset(
-                    'assets/images/rukmani.png',
+                    'assets/images/rukamni.png',
                     height: 100,
                   ),
                 ),
                 const Text(
-                  'Rukmani Sales',
+                  'Royal jewellery',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -108,6 +115,27 @@ class _DrawerScreenState extends State<DrawerScreen> {
             title: const Text('Contact Us'),
             onTap: () {
               launch("tel://9549348495");
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.policy),
+            title: const Text('Privacy Policy'),
+            onTap: () {
+              Get.to(() =>  PrivacyPolicyScreen());
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.pages_rounded),
+            title: const Text('Terms & Conditions'),
+            onTap: () {
+              Get.to(() =>  TermsAndConditionsScreen());
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.pages_rounded),
+            title: const Text('About Us'),
+            onTap: () {
+              Get.to(() =>  AboutUsScreen());
             },
           ),
           // ListTile(

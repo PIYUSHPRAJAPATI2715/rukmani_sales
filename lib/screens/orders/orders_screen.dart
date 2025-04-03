@@ -25,10 +25,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Orders',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 18),
-        ),
+        title: const Text("Orders"),
+        backgroundColor: Colors.amber,
       ),
       body: StreamBuilder(
         stream: widget.admin == true ? fireStoreService.getAdminOrdersList() : fireStoreService.getOrdersList(),

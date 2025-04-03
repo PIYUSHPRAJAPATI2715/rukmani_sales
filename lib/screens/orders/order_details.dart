@@ -60,10 +60,8 @@ class _OrderDetailsState extends State<OrderDetails> {
     log(widget.modelOrderDetails.userId.toString());
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Orders Details',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 18),
-        ),
+        title: const Text("Order Details"),
+        backgroundColor: Colors.amber,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),

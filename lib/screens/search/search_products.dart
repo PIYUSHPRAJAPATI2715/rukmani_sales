@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
@@ -20,15 +21,33 @@ class _SearchProductsState extends State<SearchProducts> {
   List<Product>? products;
   final TextEditingController searchController = TextEditingController();
   RxInt refreshInt = 0.obs;
-
+  List<Product> allProducts = [];
   String get searchText => searchController.text.trim().toLowerCase();
 
-  getAllProducts() {
-    fireStoreService.getAllProducts().then((value) {
-      products = value.docs.map((e) => Product.fromMap(e.id, e.data())).toList();
-      setState(() {});
+  getAllProducts() async {
+
+
+    // Fetch main category products
+    var mainCategories = await fireStoreService.getAllProducts();
+    allProducts.addAll(mainCategories.docs.map((e) => Product.fromMap(e.id, e.data())));
+
+    // Fetch subcategory products
+    var categoryDocs = await FirebaseFirestore.instance.collection("categories").get();
+
+    for (var category in categoryDocs.docs) {
+      var subcategories = await category.reference.collection("subcategories").get();
+
+      for (var subcategory in subcategories.docs) {
+        var subcategoryProducts = await subcategory.reference.collection("products").get();
+        allProducts.addAll(subcategoryProducts.docs.map((e) => Product.fromMap(e.id, e.data())));
+      }
+    }
+
+    setState(() {
+      products = allProducts;
     });
   }
+
 
   @override
   void initState() {

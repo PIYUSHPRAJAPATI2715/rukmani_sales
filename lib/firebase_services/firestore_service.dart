@@ -162,57 +162,69 @@ class FirebaseFireStoreService {
     required String productId,
     required String name,
     required String description,
+    required String subcategory,
     required String price,
     required String category,
     required String deletePrevious,
-    required File profileImage,
+    required dynamic profileImage, // Supports File (Mobile) & Uint8List (Web)
     required bool allowChange,
     required bool inStock,
+    required Function(bool success) updated,
     required BuildContext context,
-    required Function(bool gg) updated,
   }) async {
-    String profileUrl = profileImage.path;
-    OverlayEntry loader = NewHelper.overlayLoader(context);
+    String profileUrl = deletePrevious; // Keep previous image if not changed
+
     try {
-      if (allowChange) {
-        Overlay.of(context).insert(loader);
+      final storageRef = FirebaseStorage.instance.ref();
+
+      if (allowChange && profileImage != null) {
+        // 🔹 Delete previous image if needed
         if (deletePrevious.isNotEmpty) {
           try {
             await FirebaseStorage.instance.refFromURL(deletePrevious).delete();
-          } catch (e) {}
+          } catch (e) {
+            print("Error deleting previous image: $e");
+          }
         }
-        final userProfileImageRef = storageRef.child("product_image/${name}_${DateTime.now().millisecondsSinceEpoch}");
-        UploadTask task6 = userProfileImageRef.putFile(profileImage);
-        profileUrl = await (await task6).ref.getDownloadURL();
-      }
-      // name
-      // price
-      // imageUrl
-      // description
-      // category
 
-      await fireStore.collection("products").doc(productId).set({
+        // 🔹 Generate new image path
+        final productImageRef = storageRef.child("product_image/${name}_${DateTime.now().millisecondsSinceEpoch}");
+
+        if (kIsWeb && profileImage is Uint8List) {
+          // 🔹 Web: Upload image as bytes
+          UploadTask task = productImageRef.putData(profileImage);
+          profileUrl = await (await task).ref.getDownloadURL();
+        } else if (!kIsWeb && profileImage is File) {
+          // 🔹 Mobile: Upload image as file
+          UploadTask task = productImageRef.putFile(profileImage);
+          profileUrl = await (await task).ref.getDownloadURL();
+        } else {
+          print("Invalid image format");
+          updated(false);
+          return false;
+        }
+      }
+
+      // 🔹 Update Firestore
+      await FirebaseFirestore.instance.collection("products").doc(productId).set({
         "name": name,
         "price": price,
         "category": category,
+        "subcategory": subcategory.isNotEmpty ? subcategory : null,
         "inStock": inStock,
         "description": description,
         "imageUrl": profileUrl,
-      }).then((value) {
-        showToast("Product updated");
-        updated(true);
-        NewHelper.hideLoader(loader);
-        return true;
       });
-      NewHelper.hideLoader(loader);
-      return false;
+
+      updated(true);
+      return true;
     } catch (e) {
-      NewHelper.hideLoader(loader);
-      throw Exception(e);
-    } finally {
-      NewHelper.hideLoader(loader);
+      print("Error updating product: $e");
+      updated(false);
+      return false;
     }
   }
+
 
   Future<ModelAddress?> getAddress() async {
     final response = await fireStore.collection(addressCollection).doc(userId).get();
@@ -376,6 +388,8 @@ class FirebaseFireStoreService {
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getCategories() {
     return fireStore.collection("categories").snapshots();
+  } Stream<QuerySnapshot<Map<String, dynamic>>> getSubCategories() {
+    return fireStore.collection("subcategories").snapshots();
   }
 
   Future<bool> checkAdminAccount() async {

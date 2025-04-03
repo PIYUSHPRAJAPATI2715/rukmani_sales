@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:myproject/firebase_services/firestore_service.dart';
@@ -80,9 +81,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: widget.home == null
-          ? AppBar(
-              title: const Text('Profile'),
-            )
+          ?    AppBar(
+        title: const Text("Profile"),
+        backgroundColor: Colors.amber,
+      )
           : null,
       body: fireStoreService.userLoggedIn
           ? dataLoaded
@@ -124,20 +126,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ],
                                       shape: BoxShape.circle,
                                     ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10000),
-                                      child: Image.file(image,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) => Image.network(
-                                                image.path,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (_, __, ___) => Icon(
-                                                  CupertinoIcons.person_alt_circle,
-                                                  size: 45,
-                                                  color: Colors.grey.shade700,
-                                                ),
-                                              )),
-                                    ),
+
+
+                              child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10000),
+                              child: kIsWeb
+                                  ? Image.network(
+                                image.path.isNotEmpty ? image.path : "https://via.placeholder.com/150", // Default image if empty
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Icon(
+                                  CupertinoIcons.person_alt_circle,
+                                  size: 45,
+                                  color: Colors.grey.shade700,
+                                ),
+                              )
+                                  : Image.file(
+                                image,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Icon(
+                                  CupertinoIcons.person_alt_circle,
+                                  size: 45,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+                            ),
+
                                   ),
                                   Positioned(
                                       bottom: 0,
@@ -200,7 +213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   });
                                 },
                                 style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 50),
+                                    padding: const EdgeInsets.symmetric(horizontal: 40),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
                                 child: const Text(
                                   'Logout',
@@ -217,8 +230,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
-                                    primary: Colors.blue,
-                                    padding: const EdgeInsets.symmetric(horizontal: 50),
+                                    backgroundColor: Colors.blue,
+                                    padding: const EdgeInsets.symmetric(horizontal: 40),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
                                 child: const Text(
                                   'Update',
@@ -240,7 +253,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Get.to(const SignUpScreen());
                               },
                               style: ElevatedButton.styleFrom(
-                                  primary: Colors.red,
+                                  backgroundColor: Colors.red,
                                   padding: const EdgeInsets.symmetric(horizontal: 50),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
                               child: const Text(

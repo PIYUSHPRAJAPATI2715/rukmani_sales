@@ -1,22 +1,16 @@
-import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/route_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:myproject/helper/helper.dart';
-import 'package:myproject/screens/widgets/common_app_bar.dart';
-import 'package:myproject/screens/widgets/loading_animation.dart';
-
 import '../firebase_services/firestore_service.dart';
+import '../helper/helper.dart';
 import '../helper/new_helper.dart';
 import '../model/Category.dart';
 import '../model/model_product.dart';
-import '../screens/orders/address_screen.dart';
+import '../screens/widgets/common_app_bar.dart';
+import '../screens/widgets/loading_animation.dart';
 
 class AddProductAdmin extends StatefulWidget {
   const AddProductAdmin({super.key, this.product});
@@ -31,63 +25,68 @@ class _AddProductAdminState extends State<AddProductAdmin> {
   File image = File("");
   bool inStock = false;
   bool updating = false;
-
-  updateProfile() {
+  bool imagePicked = false;
+  bool dataLoaded = true;
+  void updateProfile() {
     if (!formKey.currentState!.validate()) return;
     if (category.value.isEmpty) {
-      showToast("Please select category");
+      Get.snackbar("Error", "Please select a category");
       return;
     }
-    if (updating == true) {
-      return;
-    }
+    // if (image.path.isEmpty) {
+    //   Get.snackbar("Error", "Please select a product image");
+    //   return;
+    // }
+
+    if (updating) return;
     updating = true;
-    try {
-      fireStoreService
-          .updateProduct(
-              category: category.value,
-              deletePrevious:
-                  widget.product != null ? widget.product!.imageUrl : "",
-              description: description.text.trim(),
-              price: price.text.trim(),
-              allowChange: imagePicked,
-              context: context,
-              inStock: inStock,
-              name: nameController.text.trim(),
-              profileImage: image,
-              productId: widget.product != null
-                  ? widget.product!.id
-                  : DateTime.now().millisecondsSinceEpoch.toString(),
-              updated: (bool value) {
-                Get.back();
-                updating = false;
-                // if(value == false)return;
-                // if (widget.fromLogin == false) {
-                //   Get.back();
-                // } else {
-                //   Get.offAll(const BottomNavigationScreen());
-                // }
-              })
-          .then((value) {})
-          .catchError((e) {
+
+    fireStoreService.updateProduct(
+      subcategory: subcategory.value,
+      category: category.value,
+      description: description.text.trim(),
+      price: price.text.trim(),
+      allowChange: imagePicked,
+      inStock: inStock,
+      context: context,
+      name: nameController.text.trim(),
+      profileImage: image,
+      deletePrevious: widget.product?.imageUrl ?? "",
+      productId: widget.product?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      updated: (bool success) {
         updating = false;
-      });
-    } catch (e) {
-      updating = false;
-    } finally {
-      updating = false;
-    }
+        if (success) {
+          Get.back();
+        }
+      },
+    );
   }
 
-  bool imagePicked = false;
-
-  bool dataLoaded = true;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController price = TextEditingController();
   final TextEditingController description = TextEditingController();
   RxString category = "".obs;
+  RxString subcategory = "".obs;
+  List<String> subcategoriesList = [];
   bool assigneInitial = false;
   final formKey = GlobalKey<FormState>();
+  Future<List<String>> fetchSubcategories(String categoryId) async {
+    print("Fetching subcategories for category: $categoryId");
+
+    QuerySnapshot subcategorySnapshot = await fireStoreService.fireStore
+        .collection("categories") // Go to the categories collection
+        .doc(categoryId) // Select the specific category document
+        .collection("subcategories") // Get its subcategories subcollection
+        .get();
+
+    List<String> subcategories = subcategorySnapshot.docs
+        .map((doc) => doc["name"] as String)
+        .toList();
+
+    print("Fetched subcategories: $subcategories");
+    return subcategories;
+  }
+
 
   @override
   void initState() {
@@ -97,6 +96,7 @@ class _AddProductAdminState extends State<AddProductAdmin> {
       price.text = widget.product!.price.toString();
       description.text = widget.product!.description.toString();
       category.value = widget.product!.category.toString();
+      subcategory.value = widget.product!.subcategory;
       image = File(widget.product!.imageUrl.toString());
       inStock = widget.product!.inStock!;
     }
@@ -105,249 +105,153 @@ class _AddProductAdminState extends State<AddProductAdmin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CommonAppBar(
-        title: "Product Details",
-      ),
+      appBar: const CommonAppBar(title: "Add Product"),
       body: dataLoaded
-          ? Container(
-              padding: const EdgeInsets.only(left: 16, top: 20, right: 16),
-              child: GestureDetector(
+          ? Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: formKey,
+          child: ListView(
+            children: [
+              GestureDetector(
                 onTap: () {
-                  FocusScope.of(context).unfocus();
+                  NewHelper.showImagePickerSheet(
+                      gotImage: (File img) {
+                        image = img;
+                        imagePicked = true;
+                        setState(() {});
+                      },
+                      context: context);
                 },
-                child: Form(
-                  key: formKey,
-                  child: ListView(
-                    children: [
-                      Center(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () {
-                            NewHelper.showImagePickerSheet(
-                                gotImage: (File gg) {
-                                  image = gg;
-                                  imagePicked = true;
-                                  setState(() {});
-                                },
-                                context: context);
-                          },
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: 130,
-                                height: 130,
-                                decoration: BoxDecoration(
-                                  border:
-                                      Border.all(width: 4, color: Colors.white),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      spreadRadius: 2,
-                                      blurRadius: 10,
-                                      color: Colors.black.withOpacity(0.1),
-                                    )
-                                  ],
-                                  shape: BoxShape.circle,
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10000),
-                                  child: Image.file(image,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) =>
-                                          Image.network(
-                                            image.path,
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => Icon(
-                                              CupertinoIcons.person_alt_circle,
-                                              size: 45,
-                                              color: Colors.grey.shade700,
-                                            ),
-                                          )),
-                                ),
-                              ),
-                              Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          width: 4,
-                                          color: Colors.white,
-                                        ),
-                                        color: Colors.blue),
-                                    child: const Icon(
-                                      Icons.edit,
-                                      color: Colors.white,
-                                    ),
-                                  ))
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      buildTextField(
-                          hintetxt: 'Enter Product Name',
-                          icon: const Icon(
-                            Icons.abc,
-                            color: Colors.blue,
-                          ),
-                          controller: nameController,
-                          keyboardType: TextInputType.name,
-                          validator: (value) {
-                            if (value!.trim().isEmpty) {
-                              return "Please enter product name";
-                            }
-                            return null;
-                          }),
-                      const SizedBox(
-                        height: 18,
-                      ),
-                      buildTextField(
-                          hintetxt: 'Enter Product Price',
-                          icon: const Padding(
-                            padding: EdgeInsets.only(left: 20, top: 5),
-                            child: Text(
-                              '₹',
-                              style: TextStyle(fontSize: 25),
-                            ),
-                          ),
-                          controller: price,
-                          keyboardType: TextInputType.number,
-                          validator: (value) {
-                            if (value!.trim().isEmpty) {
-                              return "Please enter product price";
-                            }
-                            if (value.trim().convertToNum == null) {
-                              return "Please enter valid price";
-                            }
-                            return null;
-                          }),
-                      const SizedBox(
-                        height: 18,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Categories",
-                              style: GoogleFonts.urbanist(
-                                  fontWeight: FontWeight.w600, fontSize: 13.2),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            StreamBuilder(
-                              stream: fireStoreService.getCategories(),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<
-                                          QuerySnapshot<Map<String, dynamic>>>
-                                      snapshot) {
-                                if (snapshot.hasData) {
-                                  if (snapshot.data == null)
-                                    return const LoadingAnimation();
-                                  // log(snapshot.data!.docs.map((e) => jsonEncode(e.data())).toList().toString());
-                                  List<Category> catoriesList = snapshot
-                                      .data!.docs
-                                      .map((e) =>
-                                          Category.fromMap(e.id, e.data()))
-                                      .toList();
-
-                                  if (assigneInitial == false) {
-                                    assigneInitial = true;
-                                    if (!catoriesList
-                                        .map((e) => e.name.toLowerCase())
-                                        .toList()
-                                        .contains(category.value)) {
-                                      if (catoriesList.isNotEmpty) {
-                                        category.value = catoriesList.first.name
-                                            .toLowerCase();
-                                      }
-                                    }
-                                  }
-
-                                  return Wrap(
-                                    spacing: 12,
-                                    children: catoriesList
-                                        .map((e) => Obx(() => FilterChip(
-                                            selected: category.value ==
-                                                e.name.toString().toLowerCase(),
-                                            label: Text(e.name.capitalize!),
-                                            onSelected: (gg) {
-                                              category.value = e.name
-                                                  .toString()
-                                                  .toLowerCase();
-                                            })))
-                                        .toList(),
-                                  );
-                                }
-                                return const LoadingAnimation();
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 18,
-                      ),
-                      buildTextField(
-                          hintetxt: 'Enter Product Description',
-                          allowMultiLine: true,
-                          controller: description,
-                          keyboardType: TextInputType.name,
-                          validator: (value) {
-                            if (value!.trim().isEmpty) {
-                              return "Please enter product description";
-                            }
-                            return null;
-                          }),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        children: [
-                          const Expanded(child: Text("Product In Stock")),
-                          CupertinoSwitch(
-                              value: inStock,
-                              onChanged: (value) {
-                                inStock = value;
-                                setState(() {});
-                              }),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          updateProfile();
-                        },
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.blue,
-                            padding: const EdgeInsets.symmetric(horizontal: 50),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20))),
-                        child: const Text(
-                          'Update',
-                          style: TextStyle(
-                              fontSize: 15,
-                              letterSpacing: 2,
-                              color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundImage:
+                  image.path.isNotEmpty ? FileImage(image) : null,
+                  child: image.path.isEmpty
+                      ? const Icon(Icons.add_a_photo, size: 40)
+                      : null,
                 ),
               ),
-            )
-          : const Center(
-              child: CircularProgressIndicator(),
-            ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Product Name'),
+                validator: (value) => value!.isEmpty
+                    ? "Please enter product name"
+                    : null,
+              ),
+              TextFormField(
+                controller: price,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Product Price'),
+                validator: (value) => value!.isEmpty
+                    ? "Please enter product price"
+                    : null,
+              ),
+              TextFormField(
+                controller: description,
+                decoration:
+                const InputDecoration(labelText: 'Product Description'),
+                validator: (value) => value!.isEmpty
+                    ? "Please enter product description"
+                    : null,
+              ),
+              const SizedBox(height: 20),
+              StreamBuilder(
+                stream: fireStoreService.getCategories(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (!snapshot.hasData) {
+                    return const LoadingAnimation();
+                  }
+
+                  // ✅ Debugging: Print Firestore Data
+                  snapshot.data!.docs.forEach((doc) {
+                    print("Firestore Data: ${doc.data()}");
+                  });
+
+                  List<Category> categories = snapshot.data!.docs
+                      .map((e) => Category.fromMap(e.id, e.data() as Map<String, dynamic>))
+                      .toList();
+
+                  return DropdownButtonFormField(
+                    value: category.value.isEmpty ? null : category.value,
+                    items: categories
+                        .map((cat) => DropdownMenuItem(
+                      value: cat.name,
+                      child: Text(cat.name.capitalize!),
+                    ))
+                        .toList(),
+                    onChanged: (value) async {
+                      category.value = value as String;
+
+                      // ✅ Find the selected category
+                      Category selectedCategory = categories.firstWhere((cat) => cat.name == category.value);
+
+                      // ✅ Fetch subcategories dynamically
+                      subcategoriesList = await fetchSubcategories(selectedCategory.id);
+
+                      print("Selected Category: ${selectedCategory.name}");
+                      print("Subcategories List: $subcategoriesList"); // ✅ Debugging
+
+                      // subcategory.value = ""; // Reset subcategory selection
+                      setState(() {}); // ✅ Ensure UI updates
+                    },
+
+                    decoration: const InputDecoration(labelText: 'Category'),
+                  );
+                },
+              ),
+
+
+              if (subcategoriesList.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                DropdownButtonFormField(
+                  value:
+                  subcategory.value.isEmpty ? null : subcategory.value,
+                  items: subcategoriesList
+                      .map((subcat) => DropdownMenuItem(
+                    value: subcat,
+                    child: Text(subcat.capitalize!),
+                  ))
+                      .toList(),
+                  onChanged: (value) {
+                    subcategory.value = value as String;
+                  },
+                  decoration:
+                  const InputDecoration(labelText: 'Subcategory'),
+                ),
+              ],
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Product In Stock"),
+                  CupertinoSwitch(
+                      value: inStock,
+                      onChanged: (value) {
+                        setState(() {
+                          inStock = value;
+                        });
+                      }),
+                ],
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+
+                  // if ( image.path.isEmpty) {
+                  //   Get.snackbar("Error", "Please select product image");
+                  //   return;
+                  // }
+                  updateProfile();
+                },
+                child: const Text("Save Product"),
+              ),
+            ],
+          ),
+        ),
+      )
+          : const Center(child: CircularProgressIndicator()),
     );
   }
 }

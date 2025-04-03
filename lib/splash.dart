@@ -55,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
         children: [
           Center(
             child: Image.asset(
-              'assets/images/R.gif',
+              'assets/images/rukamni.png',
 
             ),
           ),
