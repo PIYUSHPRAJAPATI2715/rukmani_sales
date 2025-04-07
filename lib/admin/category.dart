@@ -17,6 +17,7 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
   String? _imageUrl;
   String? _selectedCategory;
   bool _isSubcategory = false;
+  String? _selectedType;
 
 
 
@@ -76,6 +77,7 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
     final categoryData = {
       "name": _nameController.text,
       "imageUrl": _imageUrl,
+      "type": _selectedType,
     };
 
     if (_isSubcategory && _selectedCategory != null) {
@@ -111,7 +113,7 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
         children: [
           Expanded(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(13.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -151,6 +153,27 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
                     },
                   ),
                   SizedBox(height: 15),
+                  DropdownButtonFormField<String>(
+                    value: _selectedType,
+                    decoration: InputDecoration(
+                      labelText: "Select Type",
+                      border: OutlineInputBorder(),
+                    ),
+                    items: ["men", "women"].map((type) {
+                      return DropdownMenuItem(
+                        value: type,
+                        child: Text(type),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        _selectedType = val;
+                      });
+                    },
+                    validator: (val) => val == null ? "Please select a type" : null,
+                  ),
+
+                  SizedBox(height: 15),
                   TextField(
                     controller: _nameController,
                     decoration: InputDecoration(
@@ -177,6 +200,7 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
                       child: Image.network(_imageUrl!, height: 120, width: 120, fit: BoxFit.cover),
                     ),
                   ),
+
                   SizedBox(height: 20),
                   Center(
                     child: ElevatedButton(
@@ -203,7 +227,7 @@ class _AdminCategoryPageState extends State<AdminCategoryPage> {
                   padding: EdgeInsets.all(10),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    crossAxisSpacing: 10,
+                    crossAxisSpacing: 7,
                     mainAxisSpacing: 10,
                     childAspectRatio: 0.8,
                   ),

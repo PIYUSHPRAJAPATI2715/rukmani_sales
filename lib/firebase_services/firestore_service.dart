@@ -161,6 +161,7 @@ class FirebaseFireStoreService {
   Future<bool> updateProduct({
     required String productId,
     required String name,
+    required String productType,
     required String description,
     required String subcategory,
     required String price,
@@ -208,6 +209,7 @@ class FirebaseFireStoreService {
       // 🔹 Update Firestore
       await FirebaseFirestore.instance.collection("products").doc(productId).set({
         "name": name,
+        "productType": productType,
         "price": price,
         "category": category,
         "subcategory": subcategory.isNotEmpty ? subcategory : null,

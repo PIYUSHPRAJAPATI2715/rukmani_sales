@@ -88,8 +88,11 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
         actions: [
           fireStoreService.auth.currentUser != null?
           IconButton(
-            icon: const Icon(Icons.favorite),
-            onPressed: () => Get.to(() =>  FavoritesScreen()),
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              selectedIndex = 1;
+              setState(() {});
+            },
           ):SizedBox.shrink(),
           CartButton(
             onPressed: () {

@@ -97,6 +97,7 @@ class _HomePageState extends State<HomePageScreen> {
   //   });
   // }
   RxDouble sliderIndex = (0.0).obs;
+  RxDouble sliderIndex1 = (0.0).obs;
   int visit = 0;
   double height = 30;
   Color colorSelect = const Color(0XFF0686F8);
@@ -170,7 +171,8 @@ class _HomePageState extends State<HomePageScreen> {
               return  Column(
                 children: [
                   SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.20, // Set height explicitly
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * 0.30, // Set height explicitly
                     child: CarouselSlider(
                       options: CarouselOptions(
                         viewportFraction: 1,
@@ -277,75 +279,231 @@ class _HomePageState extends State<HomePageScreen> {
             height: 20,
           ),
           SizedBox(
-            height: 100,
+            height: 290,
             child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: firestore.collection('categories').snapshots(),
+              stream: FirebaseFirestore.instance.collection('categories').snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (snapshot.hasError) {
-                  return const Center(
-                    child: Text('Error fetching products'),
-                  );
+                  return const Center(child: Text('Error fetching categories'));
                 }
 
-                List<Category> category = snapshot.data!.docs.map((doc) {
-                  return Category.fromMap(doc.id, doc.data());
-                }).toList();
-                return ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    // padEnds: false,
-                    // controller: PageController(viewportFraction: .2),
-                    itemCount: category.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          Get.to(() => CategoryScreen(
-                                keyId: category[index].name,
-                              ));
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.transparent, width: 2)),
-                          margin: const EdgeInsets.symmetric(horizontal: 10),
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          constraints: BoxConstraints(maxWidth: context.getSize.width * .19),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircleAvatar(
-                                radius: 30, // Image radius
-                                backgroundImage: NetworkImage(category[index].imageUrl),
-                              ),
-                              const SizedBox(
-                                height: 7,
-                              ),
-                              Center(
-                                child: Text(
-                                  category[index].name.capitalize!,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
-                            ],
-                          ),
+                List<Category> allCategories = snapshot.data!.docs
+                    .map((doc) => Category.fromMap(doc.id, doc.data()))
+                    .toList();
+
+                List<Category> menCategories = allCategories.where((c) => c.type == "men").toList();
+                List<Category> womenCategories = allCategories.where((c) => c.type == "women").toList();
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (womenCategories.isNotEmpty) ...[
+                      Center(
+                        child: Text(
+                          "Women Categories",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                      );
-                    });
+                      ),
+                      _buildCategoryList(womenCategories),
+                    ],
+                    if (menCategories.isNotEmpty) ...[
+                      Center(
+                        child: Text(
+                          "Men Categories",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,),
+                        ),
+                      ),
+                      _buildCategoryList(menCategories),
+
+                    ],
+                  ],
+                );
               },
             ),
           ),
+
           const SizedBox(
-            height: 10,
+            height: 20,
           ),
+          // StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          //   stream: firestore.collection('products').snapshots(),
+          //   builder: (context, snapshot) {
+          //     if (snapshot.connectionState == ConnectionState.waiting) {
+          //       return const Center(
+          //         child: CircularProgressIndicator(),
+          //       );
+          //     }
+          //
+          //     if (snapshot.hasError) {
+          //       return const Center(
+          //         child: Text('Error fetching products'),
+          //       );
+          //     }
+          //
+          //     List<Product> products = snapshot.data!.docs.map((doc) {
+          //       return Product.fromMap(doc.id, doc.data());
+          //     }).toList();
+          //
+          //     return GridView.builder(
+          //       itemCount: products.length,
+          //       scrollDirection: Axis.vertical,
+          //       shrinkWrap: true,
+          //       physics: const NeverScrollableScrollPhysics(),
+          //       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          //         crossAxisCount: 2,
+          //         childAspectRatio: .7,
+          //       ),
+          //       itemBuilder: (context, index) {
+          //         Product product = products[index];
+          //         String? userId = FirebaseAuth.instance.currentUser?.uid;
+          //
+          //         return StreamBuilder<DocumentSnapshot>(
+          //           stream: userId != null
+          //               ? firestore.collection('users').doc(userId).collection('favorites').doc(product.id).snapshots()
+          //               : null, // Return null when user is not logged in
+          //           builder: (context, favoriteSnapshot) {
+          //             bool isFavorite = favoriteSnapshot.data?.exists ?? false;
+          //
+          //             return GestureDetector(
+          //               onTap: () {
+          //                 Get.to(() => ProductDetailsScreen(productId: product.id));
+          //               },
+          //               child: Padding(
+          //                 padding: const EdgeInsets.all(8.0),
+          //                 child: Container(
+          //                   decoration: BoxDecoration(
+          //                     color: Colors.white,
+          //                     boxShadow: const [
+          //                       BoxShadow(
+          //                         blurRadius: 4,
+          //                         color: Color(0x3600000F),
+          //                         offset: Offset(0, 2),
+          //                       )
+          //                     ],
+          //                     borderRadius: BorderRadius.circular(8),
+          //                   ),
+          //                   child: Stack(
+          //                     children: [
+          //                       Column(
+          //                         mainAxisSize: MainAxisSize.max,
+          //                         children: [
+          //                           Expanded(
+          //                             child: ClipRRect(
+          //                               borderRadius: const BorderRadius.only(
+          //                                 bottomLeft: Radius.circular(0),
+          //                                 bottomRight: Radius.circular(0),
+          //                                 topLeft: Radius.circular(8),
+          //                                 topRight: Radius.circular(8),
+          //                               ),
+          //                               child: Padding(
+          //                                 padding: const EdgeInsets.all(5.0),
+          //                                 child: CachedNetworkImage(
+          //                                   imageUrl: product.imageUrl,
+          //                                   fit: BoxFit.fill,
+          //                                   width: double.infinity,
+          //                                   placeholder: (context, url) => Center(child: CircularProgressIndicator()), // Placeholder while loading
+          //                                   errorWidget: (context, url, error) => Icon(Icons.error), // Fallback for errors
+          //                                 )
+          //                               ),
+          //                             ),
+          //                           ),
+          //                           Padding(
+          //                             padding: const EdgeInsets.only(left: 8, right: 8, top: 8),
+          //                             child: Row(
+          //                               mainAxisSize: MainAxisSize.max,
+          //                               children: [
+          //                                 Flexible(
+          //                                   child: Text(
+          //                                     product.name,
+          //                                     style: const TextStyle(fontSize: 17, color: Colors.black),
+          //                                   ),
+          //                                 ),
+          //                               ],
+          //                             ),
+          //                           ),
+          //                           Padding(
+          //                             padding: const EdgeInsets.only(left: 8, right: 8),
+          //                             child: Row(
+          //                               mainAxisSize: MainAxisSize.max,
+          //                               children: [
+          //                                 Flexible(
+          //                                   child: Text(
+          //                                     '\₹${product.price.toStringAsFixed(2)}',
+          //                                     style: const TextStyle(fontSize: 20, color: Colors.black),
+          //                                   ),
+          //                                 )
+          //                               ],
+          //                             ),
+          //                           ),
+          //                         ],
+          //                       ),
+          //                       if (userId != null)
+          //                       Positioned(
+          //                         top: 10,
+          //                         right: 10,
+          //                         child: GestureDetector(
+          //                           onTap: () {
+          //                             if (isFavorite) {
+          //                               firestore
+          //                                   .collection('users')
+          //                                   .doc(userId)
+          //                                   .collection('favorites')
+          //                                   .doc(product.id)
+          //                                   .delete();
+          //                               showToast("Product removed from wishlist");
+          //                             } else {
+          //                               firestore
+          //                                   .collection('users')
+          //                                   .doc(userId)
+          //                                   .collection('favorites')
+          //                                   .doc(product.id)
+          //                                   .set(product.toMap());
+          //                               showToast("Product added to wishlist");
+          //                             }
+          //                           },
+          //                           child: Icon(
+          //                             isFavorite ? Icons.favorite : Icons.favorite_border,
+          //                             color: isFavorite ? Colors.red : Colors.grey,
+          //                             size: 28,
+          //                           ),
+          //                         ),
+          //                       ),
+          //                     ],
+          //                   ),
+          //                 ),
+          //               ),
+          //             );
+          //           },
+          //         );
+          //       },
+          //     );
+          //   },
+          // ),
+Padding(
+  padding: const EdgeInsets.only(left: 78.0,right: 78),
+  child: InkWell(
+      onTap: (){
+
+      },
+      child: Image.asset("assets/images/p1.png",width: MediaQuery.sizeOf(context).width,fit: BoxFit.fill,height: 600,)),
+),
+SizedBox(height: 30,),
+          Center(
+            child: Text(
+              "Our Popular Products ",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,),
+            ),
+          ),
+          SizedBox(height: 20,),
           StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: firestore.collection('products').snapshots(),
+            stream: FirebaseFirestore.instance.collection('popular').snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
@@ -355,150 +513,74 @@ class _HomePageState extends State<HomePageScreen> {
 
               if (snapshot.hasError) {
                 return const Center(
-                  child: Text('Error fetching products'),
+                  child: Text('Error fetching banners'),
                 );
               }
 
-              List<Product> products = snapshot.data!.docs.map((doc) {
-                return Product.fromMap(doc.id, doc.data());
+              // 🔹 Check if snapshot has data
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return const Center(
+                  child: Text('No banners available'),
+                );
+              }
+
+              // 🔹 Convert documents into BannerModel list
+              List<BannerModel> banner = snapshot.data!.docs.map((doc) {
+                return BannerModel.fromMap(doc.id, doc.data() as Map<String, dynamic>);
               }).toList();
 
-              return GridView.builder(
-                itemCount: products.length,
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: .7,
-                ),
-                itemBuilder: (context, index) {
-                  Product product = products[index];
-                  String? userId = FirebaseAuth.instance.currentUser?.uid;
-
-                  return StreamBuilder<DocumentSnapshot>(
-                    stream: userId != null
-                        ? firestore.collection('users').doc(userId).collection('favorites').doc(product.id).snapshots()
-                        : null, // Return null when user is not logged in
-                    builder: (context, favoriteSnapshot) {
-                      bool isFavorite = favoriteSnapshot.data?.exists ?? false;
-
-                      return GestureDetector(
-                        onTap: () {
-                          Get.to(() => ProductDetailsScreen(productId: product.id));
+              return  Column(
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * 0.40, // Set height explicitly
+                    child: CarouselSlider(
+                      options: CarouselOptions(
+                        viewportFraction: 1,
+                        autoPlay: true,
+                        onPageChanged: (value, _) {
+                          sliderIndex1.value = value.toDouble();
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                        autoPlayCurve: Curves.ease,
+                      ),
+                      items: banner.map((bannerItem) {
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 48.0,right: 48),
                           child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * .02),
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              boxShadow: const [
-                                BoxShadow(
-                                  blurRadius: 4,
-                                  color: Color(0x3600000F),
-                                  offset: Offset(0, 2),
-                                )
-                              ],
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(15),
+                              color: Colors.grey,
                             ),
-                            child: Stack(
-                              children: [
-                                Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    Expanded(
-                                      child: ClipRRect(
-                                        borderRadius: const BorderRadius.only(
-                                          bottomLeft: Radius.circular(0),
-                                          bottomRight: Radius.circular(0),
-                                          topLeft: Radius.circular(8),
-                                          topRight: Radius.circular(8),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(5.0),
-                                          child: CachedNetworkImage(
-                                            imageUrl: product.imageUrl,
-                                            fit: BoxFit.fill,
-                                            width: double.infinity,
-                                            placeholder: (context, url) => Center(child: CircularProgressIndicator()), // Placeholder while loading
-                                            errorWidget: (context, url, error) => Icon(Icons.error), // Fallback for errors
-                                          )
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 8, right: 8, top: 8),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          Flexible(
-                                            child: Text(
-                                              product.name,
-                                              style: const TextStyle(fontSize: 17, color: Colors.black),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 8, right: 8),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          Flexible(
-                                            child: Text(
-                                              '\₹${product.price.toStringAsFixed(2)}',
-                                              style: const TextStyle(fontSize: 20, color: Colors.black),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                if (userId != null)
-                                Positioned(
-                                  top: 10,
-                                  right: 10,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      if (isFavorite) {
-                                        firestore
-                                            .collection('users')
-                                            .doc(userId)
-                                            .collection('favorites')
-                                            .doc(product.id)
-                                            .delete();
-                                        showToast("Product removed from wishlist");
-                                      } else {
-                                        firestore
-                                            .collection('users')
-                                            .doc(userId)
-                                            .collection('favorites')
-                                            .doc(product.id)
-                                            .set(product.toMap());
-                                        showToast("Product added to wishlist");
-                                      }
-                                    },
-                                    child: Icon(
-                                      isFavorite ? Icons.favorite : Icons.favorite_border,
-                                      color: isFavorite ? Colors.red : Colors.grey,
-                                      size: 28,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: CachedNetworkImage(
+                                imageUrl: bannerItem.imageUrl,
+                                errorWidget: (_, __, ___) => const Icon(Icons.error),
+                                placeholder: (_, __) => const Center(child: CircularProgressIndicator()),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  );
-                },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
               );
+
             },
           ),
+          SizedBox(height: 30,),
+          Padding(
+            padding: const EdgeInsets.only(left: 78.0,right: 78),
+            child: InkWell(
+                onTap: (){
 
+                },
+                child: Image.asset("assets/images/p2.png",width: MediaQuery.sizeOf(context).width,fit: BoxFit.fill,height: 600,)),
+          ),
           const SizedBox(
             height: 40,
           ),
@@ -507,3 +589,47 @@ class _HomePageState extends State<HomePageScreen> {
     );
   }
 }
+Widget _buildCategoryList(List<Category> categories) {
+  return SizedBox(
+    height: 100,
+    child: ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: categories.length,
+      itemBuilder: (context, index) {
+        final category = categories[index];
+        return GestureDetector(
+          onTap: () {
+            Get.to(() => CategoryScreen(keyId: category.name));
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.transparent, width: 2),
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            constraints: BoxConstraints(maxWidth: context.getSize.width * .19),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundImage: NetworkImage(category.imageUrl),
+                ),
+                const SizedBox(height: 7),
+                Center(
+                  child: Text(
+                    category.name.capitalize!,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ),
+  );
+}
+

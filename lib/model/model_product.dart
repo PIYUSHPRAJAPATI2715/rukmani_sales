@@ -8,12 +8,14 @@ class Product {
   String imageUrl;
   String category;
   String subcategory;
+  String type;
   bool inStock;
 
   Product({
     required this.id,
     required this.name,
     required this.price,
+    required this.type,
     required this.description,
     required this.imageUrl,
     required this.category,
@@ -28,6 +30,7 @@ class Product {
       name: map['name'] ?? '',
       price: double.tryParse(map['price'].toString()) ?? 0.0,
       description: map['description'] ?? '',
+      type: map['type'] ?? '',
       imageUrl: map['imageUrl'] ?? '',
       category: map['category'] ?? '',
       subcategory: map['subcategory'] ?? '',
@@ -41,6 +44,7 @@ class Product {
       'name': name,
       'price': price,  // ✅ Ensure stored as double
       'description': description,
+      'type': type,
       'imageUrl': imageUrl,
       'category': category,
       'subcategory': subcategory,
@@ -54,6 +58,7 @@ class Product {
     return Product(
       id: snap.id,
       name: data['name'] ?? '',
+      type: data['type'] ?? '',
       price: double.tryParse(snap['price'].toString()) ?? 0.0,
       description: data['description'] ?? '',
       imageUrl: data['imageUrl'] ?? '',

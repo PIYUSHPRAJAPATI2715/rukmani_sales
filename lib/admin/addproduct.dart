@@ -43,6 +43,7 @@ class _AddProductAdminState extends State<AddProductAdmin> {
 
     fireStoreService.updateProduct(
       subcategory: subcategory.value,
+      productType: productType.value,
       category: category.value,
       description: description.text.trim(),
       price: price.text.trim(),
@@ -87,7 +88,7 @@ class _AddProductAdminState extends State<AddProductAdmin> {
     return subcategories;
   }
 
-
+  RxString productType = "".obs;
   @override
   void initState() {
     super.initState();
@@ -97,6 +98,7 @@ class _AddProductAdminState extends State<AddProductAdmin> {
       description.text = widget.product!.description.toString();
       category.value = widget.product!.category.toString();
       subcategory.value = widget.product!.subcategory;
+      productType.value = widget.product!.type;
       image = File(widget.product!.imageUrl.toString());
       inStock = widget.product!.inStock!;
     }
@@ -157,6 +159,24 @@ class _AddProductAdminState extends State<AddProductAdmin> {
                     : null,
               ),
               const SizedBox(height: 20),
+              DropdownButtonFormField<String>(
+                value: productType.value.isEmpty ? null : productType.value,
+                decoration: const InputDecoration(labelText: 'Product Type'),
+                items: ['men', 'women']
+                    .map((type) => DropdownMenuItem(
+                  value: type,
+                  child: Text(type),
+                ))
+                    .toList(),
+                onChanged: (value) {
+                  productType.value = value!;
+                },
+                validator: (value) =>
+                value == null || value.isEmpty ? 'Please select a product type' : null,
+              ),
+
+              const SizedBox(height: 20),
+
               StreamBuilder(
                 stream: fireStoreService.getCategories(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
