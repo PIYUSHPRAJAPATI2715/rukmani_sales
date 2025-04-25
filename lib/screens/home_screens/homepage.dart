@@ -486,7 +486,7 @@ class _HomePageState extends State<HomePageScreen> {
           //   },
           // ),
 Padding(
-  padding: const EdgeInsets.only(left: 78.0,right: 78),
+  padding: const EdgeInsets.only(left: 18.0,right: 18),
   child: InkWell(
       onTap: (){
 
@@ -545,7 +545,7 @@ SizedBox(height: 30,),
                       ),
                       items: banner.map((bannerItem) {
                         return Padding(
-                          padding: const EdgeInsets.only(left: 48.0,right: 48),
+                          padding: const EdgeInsets.only(left: 18.0,right: 18),
                           child: Container(
                             width: MediaQuery.of(context).size.width,
                             margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * .02),
@@ -574,7 +574,7 @@ SizedBox(height: 30,),
           ),
           SizedBox(height: 30,),
           Padding(
-            padding: const EdgeInsets.only(left: 78.0,right: 78),
+            padding: const EdgeInsets.only(left: 18.0,right: 18),
             child: InkWell(
                 onTap: (){
 
